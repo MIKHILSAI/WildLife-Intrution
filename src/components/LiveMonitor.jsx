@@ -47,12 +47,17 @@ export default function LiveMonitor({ systemState }) {
         const [x, y, width, height] = prediction.bbox;
         
         // We look for certain classes to simulate wildlife
-        const threatClasses = ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'];
+        const threatClasses = ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'pig'];
         const isThreat = threatClasses.includes(prediction.class) && prediction.score > 0.40;
         
         ctx.strokeStyle = isThreat ? '#ef4444' : '#10b981'; // Red or Green
         ctx.lineWidth = 4;
         ctx.strokeRect(x, y, width, height);
+        
+        let mappedClass = prediction.class;
+        if (mappedClass === 'bird') mappedClass = 'bird / peacock';
+        if (mappedClass === 'bear' || mappedClass === 'cow' || mappedClass === 'sheep' || mappedClass === 'pig') mappedClass = mappedClass + ' / wild boar';
+        if (mappedClass === 'cat' || mappedClass === 'dog') mappedClass = mappedClass + ' / monkey';
 
         ctx.fillStyle = isThreat ? '#ef4444' : '#10b981';
         ctx.fillRect(x, y - 30, width, 30);
@@ -60,14 +65,14 @@ export default function LiveMonitor({ systemState }) {
         ctx.fillStyle = '#FFFFFF';
         ctx.font = '16px Inter';
         ctx.fillText(
-          `${prediction.class.toUpperCase()} - ${Math.round(prediction.score * 100)}%`,
+          `${mappedClass.toUpperCase()} - ${Math.round(prediction.score * 100)}%`,
           x + 5,
           y - 10
         );
 
         if (isThreat) {
            if (!criticalDetection || prediction.score > criticalDetection.score) {
-               criticalDetection = prediction;
+               criticalDetection = { ...prediction, class: mappedClass };
            }
         }
       });

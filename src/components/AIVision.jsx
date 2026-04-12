@@ -37,7 +37,13 @@ export default function AIVision({ systemState, playSound, stopSound }) {
 
       predictions.forEach(prediction => {
         const [x, y, width, height] = prediction.bbox;
-        const threatClasses = ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'];
+        const threatClasses = ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe', 'pig'];
+        
+        let mappedClass = prediction.class;
+        if (mappedClass === 'bird') mappedClass = 'bird / peacock';
+        if (mappedClass === 'bear' || mappedClass === 'cow' || mappedClass === 'sheep') mappedClass = mappedClass + ' / wild boar';
+        if (mappedClass === 'cat' || mappedClass === 'dog') mappedClass = mappedClass + ' / monkey';
+
         // Optimal threshold filtering
         const isThreat = threatClasses.includes(prediction.class) && prediction.score > 0.40;
         
@@ -47,7 +53,7 @@ export default function AIVision({ systemState, playSound, stopSound }) {
 
         if (isThreat) {
            if (!criticalDetection || prediction.score > criticalDetection.score) {
-               criticalDetection = prediction;
+               criticalDetection = { ...prediction, class: mappedClass }; // Inject mapped class payload
            }
         }
       });

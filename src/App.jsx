@@ -30,77 +30,71 @@ function playDeterrenceSound(subject) {
   if (!AudioContext) return;
   const ctx = new AudioContext();
   activeAudioContexts.push(ctx);
-  const oscillator = ctx.createOscillator();
-  const gainNode = ctx.createGain();
-  
+
   const animal = (subject || '').toLowerCase();
 
-  if (animal === 'elephant') {
-    // Massive, aggressive layered tribal drum bass for real-world deterrence
+  // ----- ELEPHANT: Drum Bass -----
+  if (animal.includes('elephant')) {
     for(let i=0; i<8; i++) {
-        const timeOffset = ctx.currentTime + (i * 0.45);
-        
-        // Layer 1: Sub Bass Deep Punch (Booming effect)
-        const sub = ctx.createOscillator();
-        const subGain = ctx.createGain();
-        sub.type = 'sine';
-        sub.frequency.setValueAtTime(100, timeOffset); 
-        sub.frequency.exponentialRampToValueAtTime(30, timeOffset + 0.3);
-        subGain.gain.setValueAtTime(3.0, timeOffset); // Extremely loud bass
-        subGain.gain.exponentialRampToValueAtTime(0.01, timeOffset + 0.3);
-        sub.connect(subGain);
-        subGain.connect(ctx.destination);
-        sub.start(timeOffset);
-        sub.stop(timeOffset + 0.4);
+        const t = ctx.currentTime + (i * 0.45);
+        const sub = ctx.createOscillator(); const sg = ctx.createGain();
+        sub.type = 'sine'; sub.frequency.setValueAtTime(100, t); sub.frequency.exponentialRampToValueAtTime(30, t+0.3);
+        sg.gain.setValueAtTime(3.0, t); sg.gain.exponentialRampToValueAtTime(0.01, t+0.3);
+        sub.connect(sg); sg.connect(ctx.destination); sub.start(t); sub.stop(t+0.4);
 
-        // Layer 2: Aggressive Mid-Range Distorted Sawtooth
-        const mid = ctx.createOscillator();
-        const midGain = ctx.createGain();
-        mid.type = 'sawtooth';
-        mid.frequency.setValueAtTime(150, timeOffset);
-        mid.frequency.exponentialRampToValueAtTime(40, timeOffset + 0.15);
-        midGain.gain.setValueAtTime(1.5, timeOffset); // Sharp aggressive knock
-        midGain.gain.exponentialRampToValueAtTime(0.01, timeOffset + 0.2);
-        mid.connect(midGain);
-        midGain.connect(ctx.destination);
-        mid.start(timeOffset);
-        mid.stop(timeOffset + 0.3);
-        
-        // Layer 3: High frequency chaotic snap
-        const high = ctx.createOscillator();
-        const highGain = ctx.createGain();
-        high.type = 'square';
-        high.frequency.setValueAtTime(500, timeOffset);
-        high.frequency.exponentialRampToValueAtTime(100, timeOffset + 0.05);
-        highGain.gain.setValueAtTime(0.5, timeOffset);
-        highGain.gain.exponentialRampToValueAtTime(0.01, timeOffset + 0.1);
-        high.connect(highGain);
-        highGain.connect(ctx.destination);
-        high.start(timeOffset);
-        high.stop(timeOffset + 0.15);
+        const mid = ctx.createOscillator(); const mg = ctx.createGain();
+        mid.type = 'sawtooth'; mid.frequency.setValueAtTime(150, t); mid.frequency.exponentialRampToValueAtTime(40, t+0.15);
+        mg.gain.setValueAtTime(1.5, t); mg.gain.exponentialRampToValueAtTime(0.01, t+0.2);
+        mid.connect(mg); mg.connect(ctx.destination); mid.start(t); mid.stop(t+0.3);
     }
-    return;
-  } else if (animal === 'bird') {
-    // Predator bird call / high sweep
-    oscillator.type = 'triangle';
-    oscillator.frequency.setValueAtTime(3000, ctx.currentTime);
-    oscillator.frequency.linearRampToValueAtTime(6000, ctx.currentTime + 0.5);
-  } else {
-    // Default High-frequency disturbing sound for boars/dogs/general
-    oscillator.type = 'sawtooth';
-    oscillator.frequency.setValueAtTime(8000, ctx.currentTime); 
-    oscillator.frequency.exponentialRampToValueAtTime(8200, ctx.currentTime + 0.1);
-    oscillator.frequency.exponentialRampToValueAtTime(7800, ctx.currentTime + 0.2);
+  } 
+  // ----- PEACOCK / BIRD: Screeching Predator Sweeps -----
+  else if (animal.includes('bird') || animal.includes('peacock')) {
+    for(let i=0; i<5; i++) {
+        const t = ctx.currentTime + (i * 0.6);
+        const osc = ctx.createOscillator(); const g = ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(2000, t);
+        osc.frequency.exponentialRampToValueAtTime(6000, t + 0.3);
+        g.gain.setValueAtTime(2.0, t);
+        g.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+        osc.connect(g); g.connect(ctx.destination);
+        osc.start(t); osc.stop(t + 0.6);
+
+        // Clapping noise layer
+        const snap = ctx.createOscillator(); const sGain = ctx.createGain();
+        snap.type = 'square'; snap.frequency.setValueAtTime(150, t); snap.frequency.exponentialRampToValueAtTime(50, t+0.1);
+        sGain.gain.setValueAtTime(1.5, t); sGain.gain.exponentialRampToValueAtTime(0.01, t+0.1);
+        snap.connect(sGain); sGain.connect(ctx.destination); snap.start(t); snap.stop(t+0.2);
+    }
+  } 
+  // ----- WILD BOAR / BEAR / PIG: Low Frequency Roar & High pitched irritation -----
+  else if (animal.includes('boar') || animal.includes('bear') || animal.includes('cow') || animal.includes('dog')) {
+    for(let i=0; i<4; i++) {
+        const t = ctx.currentTime + (i * 0.8);
+        const growl = ctx.createOscillator(); const gg = ctx.createGain();
+        growl.type = 'sawtooth'; growl.frequency.setValueAtTime(40, t); growl.frequency.linearRampToValueAtTime(60, t+0.4);
+        gg.gain.setValueAtTime(2.5, t); gg.gain.linearRampToValueAtTime(0.01, t+0.6);
+        growl.connect(gg); gg.connect(ctx.destination); growl.start(t); growl.stop(t+0.7);
+
+        const whistle = ctx.createOscillator(); const wg = ctx.createGain();
+        whistle.type = 'sine'; whistle.frequency.setValueAtTime(12000, t);
+        wg.gain.setValueAtTime(1.5, t); wg.gain.exponentialRampToValueAtTime(0.01, t+0.7);
+        whistle.connect(wg); wg.connect(ctx.destination); whistle.start(t); whistle.stop(t+0.8);
+    }
   }
-  
-  gainNode.gain.setValueAtTime(0.2, ctx.currentTime); // keep max volume safe but annoying
-  gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 4);
-  
-  oscillator.connect(gainNode);
-  gainNode.connect(ctx.destination);
-  
-  oscillator.start();
-  oscillator.stop(ctx.currentTime + 4);
+  // ----- MONKEY / CAT / SMALL MAMMALS: Ultrasound Chaos sweeps -----
+  else {
+    for(let i=0; i<10; i++) {
+        const t = ctx.currentTime + (i * 0.25);
+        const osc = ctx.createOscillator(); const g = ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(14000 + Math.random()*2000, t); // Piercing high freq
+        osc.frequency.linearRampToValueAtTime(15000, t+0.1);
+        g.gain.setValueAtTime(1.0, t); g.gain.linearRampToValueAtTime(0.01, t+0.2);
+        osc.connect(g); g.connect(ctx.destination); osc.start(t); osc.stop(t+0.25);
+    }
+  }
 }
 
 function sendPhoneAlert(subject) {
