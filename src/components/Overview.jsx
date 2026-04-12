@@ -93,16 +93,26 @@ export default function Overview({ systemState }) {
             <span className="text-primary" style={{ cursor: 'pointer', fontWeight: 600 }}>View All Events &rarr;</span>
           </div>
 
-          <div className="panel-card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem' }}>
-             <div style={{ padding: '0.75rem', backgroundColor: 'var(--primary-container)', borderRadius: '8px', color: 'var(--primary)' }}><Activity size={24} /></div>
-             <div style={{ flex: 1 }}>
-               <h4 style={{ fontSize: '1.1rem' }}>{systemState.recentAlerts[0] ? `${systemState.recentAlerts[0].type} Detection` : 'Node 08 Detection'}</h4>
-               <p className="text-muted" style={{ fontSize: '0.9rem' }}>{systemState.recentAlerts[0] ? `Distance: ${systemState.recentAlerts[0].dist}` : 'Small macro-organism bypassed - Zone C'}</p>
-             </div>
-             <div style={{ textAlign: 'right' }}>
-               <p style={{ fontWeight: 600 }}>{systemState.recentAlerts[0] ? systemState.recentAlerts[0].time : '04:12 AM'}</p>
-               <span style={{ backgroundColor: 'var(--surface-container-highest)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>LOGGED</span>
-             </div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+            {systemState.recentAlerts.slice(0, 3).map((alert, idx) => (
+              <div key={alert.id || idx} className="panel-card" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', animation: 'fadeIn 0.3s ease' }}>
+                 <div style={{ padding: '0.75rem', backgroundColor: 'var(--error-container)', borderRadius: '8px', color: 'var(--error)' }}><Activity size={24} /></div>
+                 <div style={{ flex: 1 }}>
+                   <h4 style={{ fontSize: '1.1rem' }}>{alert.type} Detection</h4>
+                   <p className="text-muted" style={{ fontSize: '0.9rem' }}>Distance: {alert.dist}</p>
+                 </div>
+                 <div style={{ textAlign: 'right' }}>
+                   <p style={{ fontWeight: 600 }}>{alert.time}</p>
+                   <span style={{ backgroundColor: 'var(--error-container)', color: 'var(--error)', border: '1px solid var(--error)', padding: '2px 8px', borderRadius: '4px', fontSize: '0.75rem', fontWeight: 'bold' }}>ALERTED</span>
+                 </div>
+              </div>
+            ))}
+
+            {systemState.recentAlerts.length === 0 && (
+              <div className="text-muted" style={{ padding: '2rem', textAlign: 'center', backgroundColor: 'var(--surface-container-low)', borderRadius: '12px' }}>
+                System AI monitoring. No active alerts reported today.
+              </div>
+            )}
           </div>
 
         </div>

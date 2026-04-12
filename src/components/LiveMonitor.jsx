@@ -48,7 +48,7 @@ export default function LiveMonitor({ systemState }) {
         
         // We look for certain classes to simulate wildlife
         const threatClasses = ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'];
-        const isThreat = threatClasses.includes(prediction.class) && prediction.score > 0.30;
+        const isThreat = threatClasses.includes(prediction.class) && prediction.score > 0.40;
         
         ctx.strokeStyle = isThreat ? '#ef4444' : '#10b981'; // Red or Green
         ctx.lineWidth = 4;
@@ -66,7 +66,9 @@ export default function LiveMonitor({ systemState }) {
         );
 
         if (isThreat) {
-           criticalDetection = prediction;
+           if (!criticalDetection || prediction.score > criticalDetection.score) {
+               criticalDetection = prediction;
+           }
         }
       });
 

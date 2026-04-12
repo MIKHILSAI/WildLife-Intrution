@@ -38,15 +38,17 @@ export default function AIVision({ systemState, playSound }) {
       predictions.forEach(prediction => {
         const [x, y, width, height] = prediction.bbox;
         const threatClasses = ['bird', 'cat', 'dog', 'horse', 'sheep', 'cow', 'elephant', 'bear', 'zebra', 'giraffe'];
-        // Lowered threshold to 30% to easily catch blurry running videos
-        const isThreat = threatClasses.includes(prediction.class) && prediction.score > 0.30;
+        // Optimal threshold filtering
+        const isThreat = threatClasses.includes(prediction.class) && prediction.score > 0.40;
         
         ctx.strokeStyle = isThreat ? '#ef4444' : '#10b981';
         ctx.lineWidth = 4;
         ctx.strokeRect(x, y, width, height);
 
         if (isThreat) {
-           criticalDetection = prediction;
+           if (!criticalDetection || prediction.score > criticalDetection.score) {
+               criticalDetection = prediction;
+           }
         }
       });
 

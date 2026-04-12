@@ -25,28 +25,48 @@ function playDeterrenceSound(subject) {
   const animal = (subject || '').toLowerCase();
 
   if (animal === 'elephant') {
-    // Tribal drum / loud low frequency burst
-    oscillator.type = 'square';
-    oscillator.frequency.setValueAtTime(60, ctx.currentTime); // Low rumble drum
-    oscillator.frequency.exponentialRampToValueAtTime(40, ctx.currentTime + 0.2);
-    // Rapid pulsing for drum effect
-    gainNode.gain.setValueAtTime(1, ctx.currentTime);
-    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
-    oscillator.start();
-    oscillator.stop(ctx.currentTime + 0.3);
-    
-    // Repeat drum pattern multiple times to simulate drums
-    for(let i=1; i<10; i++) {
-        const osc2 = ctx.createOscillator();
-        const gain2 = ctx.createGain();
-        osc2.type = 'square';
-        osc2.frequency.setValueAtTime(50 + (Math.random()*20), ctx.currentTime + (i * 0.4));
-        gain2.gain.setValueAtTime(1, ctx.currentTime + (i * 0.4));
-        gain2.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + (i * 0.4) + 0.2);
-        osc2.connect(gain2);
-        gain2.connect(ctx.destination);
-        osc2.start(ctx.currentTime + (i * 0.4));
-        osc2.stop(ctx.currentTime + (i * 0.4) + 0.3);
+    // Massive, aggressive layered tribal drum bass for real-world deterrence
+    for(let i=0; i<8; i++) {
+        const timeOffset = ctx.currentTime + (i * 0.45);
+        
+        // Layer 1: Sub Bass Deep Punch (Booming effect)
+        const sub = ctx.createOscillator();
+        const subGain = ctx.createGain();
+        sub.type = 'sine';
+        sub.frequency.setValueAtTime(100, timeOffset); 
+        sub.frequency.exponentialRampToValueAtTime(30, timeOffset + 0.3);
+        subGain.gain.setValueAtTime(3.0, timeOffset); // Extremely loud bass
+        subGain.gain.exponentialRampToValueAtTime(0.01, timeOffset + 0.3);
+        sub.connect(subGain);
+        subGain.connect(ctx.destination);
+        sub.start(timeOffset);
+        sub.stop(timeOffset + 0.4);
+
+        // Layer 2: Aggressive Mid-Range Distorted Sawtooth
+        const mid = ctx.createOscillator();
+        const midGain = ctx.createGain();
+        mid.type = 'sawtooth';
+        mid.frequency.setValueAtTime(150, timeOffset);
+        mid.frequency.exponentialRampToValueAtTime(40, timeOffset + 0.15);
+        midGain.gain.setValueAtTime(1.5, timeOffset); // Sharp aggressive knock
+        midGain.gain.exponentialRampToValueAtTime(0.01, timeOffset + 0.2);
+        mid.connect(midGain);
+        midGain.connect(ctx.destination);
+        mid.start(timeOffset);
+        mid.stop(timeOffset + 0.3);
+        
+        // Layer 3: High frequency chaotic snap
+        const high = ctx.createOscillator();
+        const highGain = ctx.createGain();
+        high.type = 'square';
+        high.frequency.setValueAtTime(500, timeOffset);
+        high.frequency.exponentialRampToValueAtTime(100, timeOffset + 0.05);
+        highGain.gain.setValueAtTime(0.5, timeOffset);
+        highGain.gain.exponentialRampToValueAtTime(0.01, timeOffset + 0.1);
+        high.connect(highGain);
+        highGain.connect(ctx.destination);
+        high.start(timeOffset);
+        high.stop(timeOffset + 0.15);
     }
     return;
   } else if (animal === 'bird') {
