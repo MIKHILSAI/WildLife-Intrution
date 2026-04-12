@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, ShieldAlert, Activity, Battery, Signal, Zap } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Activity, Battery, Signal, Zap, Smartphone, CheckCircle } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 export default function Overview({ systemState }) {
@@ -11,6 +11,7 @@ export default function Overview({ systemState }) {
   );
   
   const [battery, setBattery] = useState(84);
+  const [waNumber, setWaNumber] = useState(localStorage.getItem('namma_wa_number') || '');
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -117,21 +118,47 @@ export default function Overview({ systemState }) {
 
         </div>
 
-        <div className="panel-card" style={{ backgroundColor: '#064e3b', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
-           <div>
-             <h3 style={{ marginBottom: '1rem', color: '#ecfdf5' }}>Today's Stats</h3>
-             <p style={{ fontSize: '0.8rem', color: '#6ee7b7', letterSpacing: '1px' }}>TOTAL INTRUSIONS</p>
-             <h1 style={{ fontSize: '3rem', margin: '0.5rem 0' }}>{systemState.intrusionsToday.toString().padStart(2, '0')}</h1>
-             <p style={{ fontSize: '0.8rem', color: '#6ee7b7' }}>88% LOWER THAN AVG</p>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+           <div className="panel-card" style={{ backgroundColor: '#064e3b', color: 'white', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', flex: 1 }}>
+              <div>
+                <h3 style={{ marginBottom: '1rem', color: '#ecfdf5' }}>Today's Stats</h3>
+                <p style={{ fontSize: '0.8rem', color: '#6ee7b7', letterSpacing: '1px' }}>TOTAL INTRUSIONS</p>
+                <h1 style={{ fontSize: '3rem', margin: '0.5rem 0' }}>{systemState.intrusionsToday.toString().padStart(2, '0')}</h1>
+                <p style={{ fontSize: '0.8rem', color: '#6ee7b7' }}>88% LOWER THAN AVG</p>
+              </div>
+              
+              <div style={{ marginTop: '2rem' }}>
+                <p style={{ fontSize: '0.8rem', color: '#6ee7b7', letterSpacing: '1px' }}>RISK LEVEL</p>
+                <h2 style={{ fontSize: '2rem' }}>{systemState.riskLevel.toUpperCase()}</h2>
+                <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                  <div style={{ height: 4, flex: 1, backgroundColor: systemState.riskLevel === 'Low' ? '#10b981' : '#dc2626' }}></div>
+                  <div style={{ height: 4, flex: 1, backgroundColor: systemState.riskLevel === 'Critical' ? '#dc2626' : '#065f46' }}></div>
+                  <div style={{ height: 4, flex: 1, backgroundColor: '#065f46' }}></div>
+                </div>
+              </div>
            </div>
-           
-           <div style={{ marginTop: '2rem' }}>
-             <p style={{ fontSize: '0.8rem', color: '#6ee7b7', letterSpacing: '1px' }}>RISK LEVEL</p>
-             <h2 style={{ fontSize: '2rem' }}>{systemState.riskLevel.toUpperCase()}</h2>
-             <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
-               <div style={{ height: 4, flex: 1, backgroundColor: systemState.riskLevel === 'Low' ? '#10b981' : '#dc2626' }}></div>
-               <div style={{ height: 4, flex: 1, backgroundColor: systemState.riskLevel === 'Critical' ? '#dc2626' : '#065f46' }}></div>
-               <div style={{ height: 4, flex: 1, backgroundColor: '#065f46' }}></div>
+
+           <div className="panel-card" style={{ backgroundColor: 'var(--surface-container-low)', border: '1px solid var(--outline-variant)' }}>
+             <h3 style={{ marginBottom: '0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1.1rem' }}>
+               <Smartphone size={20} /> WhatsApp Alerts
+             </h3>
+             <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', marginBottom: '1rem' }}>
+               Enter mobile number to receive automated incident reports.
+             </p>
+             <input 
+               type="text" 
+               className="combo-box" 
+               placeholder="+91..." 
+               value={waNumber} 
+               onChange={(e) => {
+                 setWaNumber(e.target.value);
+                 localStorage.setItem('namma_wa_number', e.target.value);
+               }} 
+               style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', marginBottom: '0.5rem', border: '1px solid var(--primary)', backgroundColor: 'var(--surface)' }}
+             />
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+               <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)' }}>Browser popups required</span>
+               {waNumber.length > 5 && <span style={{ fontSize: '0.75rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 'bold' }}><CheckCircle size={14} /> ACTIVE</span>}
              </div>
            </div>
         </div>
