@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { ShieldCheck, ShieldAlert, Activity, Battery, Signal, Zap, Smartphone, CheckCircle } from 'lucide-react';
+import { ShieldCheck, ShieldAlert, Activity, Battery, Signal, Zap, Smartphone, CheckCircle, Send } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import { sendWhatsAppAlert } from '../App';
 
 export default function Overview({ systemState }) {
   const isAlert = systemState.status !== 'Safe';
@@ -157,7 +158,12 @@ export default function Overview({ systemState }) {
                style={{ width: '100%', padding: '0.75rem', borderRadius: '6px', marginBottom: '0.5rem', border: '1px solid var(--primary)', backgroundColor: 'var(--surface)' }}
              />
              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-               <span style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)' }}>Browser popups required</span>
+               <button 
+                 onClick={() => sendWhatsAppAlert('SIMULATED TEST', 'Testing neural routing backbone...', true)}
+                 style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', padding: '0.25rem 0.5rem', backgroundColor: 'var(--primary)', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', fontSize: '0.75rem' }}
+               >
+                 <Send size={12} /> Test Routing
+               </button>
                {waNumber.length > 5 && <span style={{ fontSize: '0.75rem', color: '#10b981', display: 'flex', alignItems: 'center', gap: '0.25rem', fontWeight: 'bold' }}><CheckCircle size={14} /> ACTIVE</span>}
              </div>
            </div>

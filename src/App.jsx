@@ -123,6 +123,31 @@ export function playDeterrenceSound(subject, isTest = false) {
   }
 }
 
+export function sendWhatsAppAlert(subject, analysis, force = false) {
+  const phone = localStorage.getItem('namma_wa_number');
+  if (!phone || phone.length < 5) {
+     if(force) alert("Please enter a valid phone number first.");
+     return;
+  }
+  
+  if (!force) {
+    const lastTrigger = localStorage.getItem('last_wa_alert');
+    if (lastTrigger && Date.now() - parseInt(lastTrigger) < 20000) return; // 20 sec cooldown
+  }
+  localStorage.setItem('last_wa_alert', Date.now().toString());
+
+  const text = `🚨 *NAMMA PAYIR - SMART SYSTEM ALERT* 🚨\n\n*Threat Identified:* ${subject.toUpperCase()}\n*Risk Level:* CRITICAL\n*Location:* Sector A (Main Node)\n\n*AI Neural Analysis:*\n${analysis || 'Rapid perimeter breach. Highly evasive.'}\n\n*Action Taken:* Acoustic Deterrence Habituation Engine Engaged.`;
+  
+  // wa.me strictly prefers only digits (e.g. 917904961661) without the '+'
+  const cleanPhone = phone.replace(/[^0-9]/g, '');
+  const url = `https://wa.me/${cleanPhone}?text=${encodeURIComponent(text)}`;
+  
+  const newWin = window.open(url, '_blank');
+  if (!newWin || newWin.closed || typeof newWin.closed === 'undefined') {
+      alert("⚠️ BROWSER POPUP BLOCKED: Your browser blocked the automatic WhatsApp alert. Please click the 'Always allow popups' icon in your URL bar (usually a small box with a red X at the far right) to explicitly enable automated routing natively for this terminal!");
+  }
+}
+
 function sendPhoneAlert(subject) {
   const phoneTarget = localStorage.getItem('farmerPhone') || '+91 9988776655';
   
