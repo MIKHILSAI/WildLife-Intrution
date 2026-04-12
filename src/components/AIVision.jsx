@@ -3,6 +3,7 @@ import { Target, Activity, ShieldAlert, Cpu, Download } from 'lucide-react';
 import Webcam from 'react-webcam';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import '@tensorflow/tfjs';
+import { setAcousticConfig } from '../App';
 
 export default function AIVision({ systemState, playSound, stopSound }) {
   const isAlert = systemState.status !== 'Safe';
@@ -11,6 +12,9 @@ export default function AIVision({ systemState, playSound, stopSound }) {
   const canvasRef = useRef(null);
   const [model, setModel] = useState(null);
   const lastAlertTimeRef = useRef(0);
+  
+  const [acousticMode, setAcousticMode] = useState('AI');
+  const [manualSequence, setManualSequence] = useState('drum,roar,ultrasound');
 
   useEffect(() => {
     // Load COCO-SSD Model
@@ -231,25 +235,64 @@ export default function AIVision({ systemState, playSound, stopSound }) {
                </div>
             </div>
 
-            <button 
-              className="btn" 
-              style={{ width: '100%', backgroundColor: 'var(--surface-container-high)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)', marginTop: '1.5rem' }}
-              onClick={() => {
-                if (playSound) playSound(systemState.aiSubject || 'elephant');
-              }}
-            >
-              Cycle Sound Pattern
-            </button>
-            <button 
-              className="btn" 
-              style={{ width: '100%', backgroundColor: 'var(--error)', color: 'white', marginTop: '0.5rem' }}
-              onClick={() => {
-                if (stopSound) stopSound();
-                alert("EMERGENCY OVERRIDE ENGAGED. Deterrence hardware halted.");
-              }}
-            >
-              EMERGENCY STOP
-            </button>
+            <div className="panel-card" style={{ marginTop: '1.5rem', backgroundColor: 'var(--surface)', padding: '1rem' }}>
+              <h4 style={{ marginBottom: '1rem', fontSize: '0.85rem' }}>Acoustic Habituation Engine</h4>
+              
+              <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <button 
+                    onClick={() => { setAcousticMode('AI'); setAcousticConfig('AI', ''); }} 
+                    style={{ flex: 1, fontSize: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderRadius: '6px', border: 'none', backgroundColor: acousticMode === 'AI' ? 'var(--primary)' : 'var(--surface-container-high)', color: acousticMode === 'AI' ? 'white' : 'var(--on-surface)' }}
+                  >
+                    AI-Enhanced Auto
+                  </button>
+                  <button 
+                    onClick={() => { setAcousticMode('Manual'); setAcousticConfig('Manual', manualSequence); }} 
+                    style={{ flex: 1, fontSize: '0.75rem', padding: '0.5rem', cursor: 'pointer', borderRadius: '6px', border: 'none', backgroundColor: acousticMode === 'Manual' ? 'var(--primary)' : 'var(--surface-container-high)', color: acousticMode === 'Manual' ? 'white' : 'var(--on-surface)' }}
+                  >
+                    Manual Override
+                  </button>
+              </div>
+
+              {acousticMode === 'Manual' ? (
+                 <div style={{ padding: '0.75rem', backgroundColor: 'var(--surface-container-low)', borderRadius: '8px', marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--on-surface-variant)', marginBottom: '0.5rem' }}>Define acoustic cycle array (Executes sequentially to prevent adaptation):</p>
+                    <select 
+                       style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', marginBottom: '0.25rem', backgroundColor: 'var(--surface-container-highest)', color: 'var(--on-surface)', border: '1px solid var(--outline-variant)' }}
+                       onChange={(e) => { setManualSequence(e.target.value); setAcousticConfig('Manual', e.target.value); }}
+                       value={manualSequence}
+                    >
+                       <option value="drum,roar,ultrasound">Seq A: Tribal Drum &rarr; Low Roar &rarr; Ultrasound</option>
+                       <option value="ultrasound,screech,roar">Seq B: Ultrasound &rarr; Predator Screech &rarr; Roar</option>
+                       <option value="roar,drum,screech">Seq C: Low Roar &rarr; Drum &rarr; Predator Screech</option>
+                    </select>
+                 </div>
+              ) : (
+                 <div style={{ padding: '0.75rem', backgroundColor: 'var(--primary-container)', borderRadius: '8px', marginBottom: '1rem' }}>
+                    <p style={{ fontSize: '0.75rem', color: 'var(--primary)', fontWeight: 600 }}>● Neural Acoustic Mutation Active</p>
+                    <p style={{ fontSize: '0.7rem', color: 'var(--on-surface-variant)', marginTop: '0.25rem' }}>System autonomously shifts frequency band signatures upon detecting physiological habituation or sustained target dwell time.</p>
+                 </div>
+              )}
+
+              <button 
+                className="btn" 
+                style={{ width: '100%', backgroundColor: 'var(--surface-container-highest)', border: '1px solid var(--outline-variant)', color: 'var(--on-surface)' }}
+                onClick={() => {
+                  if (playSound) playSound(systemState.aiSubject || 'elephant', true);
+                }}
+              >
+                TEST CYCLE INTERVAL
+              </button>
+              <button 
+                className="btn" 
+                style={{ width: '100%', backgroundColor: 'var(--error)', color: 'white', marginTop: '0.5rem' }}
+                onClick={() => {
+                  if (stopSound) stopSound();
+                  alert("EMERGENCY OVERRIDE ENGAGED. Deterrence hardware halted.");
+                }}
+              >
+                EMERGENCY STOP
+              </button>
+            </div>
           </div>
 
         </div>

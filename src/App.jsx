@@ -17,6 +17,17 @@ const socket = io('http://localhost:3000');
 
 let activeAudioContexts = [];
 
+export let acousticModeGlobal = 'AI';
+export let manualSequenceGlobal = ['drum', 'roar', 'ultrasound'];
+let sequenceIndexGlobal = 0;
+let lastSubjectGlobal = '';
+
+export function setAcousticConfig(mode, seqString) {
+  acousticModeGlobal = mode;
+  if(seqString) manualSequenceGlobal = seqString.split(',');
+  sequenceIndexGlobal = 0;
+}
+
 export function stopDeterrenceSound() {
   activeAudioContexts.forEach(ctx => {
     try { ctx.close(); } catch(e){}
@@ -25,56 +36,73 @@ export function stopDeterrenceSound() {
   if (window.speechSynthesis) window.speechSynthesis.cancel();
 }
 
-function playDeterrenceSound(subject) {
+export function playDeterrenceSound(subject, isTest = false) {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
   const ctx = new AudioContext();
   activeAudioContexts.push(ctx);
 
   const animal = (subject || '').toLowerCase();
+  let patternToPlay = '';
 
-  // ----- ELEPHANT: Drum Bass -----
-  if (animal.includes('elephant')) {
+  // Calculate Habituation Strategy
+  if (acousticModeGlobal === 'Manual') {
+      patternToPlay = manualSequenceGlobal[sequenceIndexGlobal];
+      sequenceIndexGlobal = (sequenceIndexGlobal + 1) % manualSequenceGlobal.length;
+  } else {
+      // AI-Enhanced Mode: If the same animal lingers, mutate the frequency wildly!
+      if (animal === lastSubjectGlobal && !isTest) {
+          const patterns = ['drum', 'screech', 'roar', 'ultrasound'];
+          patternToPlay = patterns[Math.floor(Math.random() * patterns.length)]; // Mutate
+      } else {
+          // Standard AI specific mapping
+          if (animal.includes('elephant')) patternToPlay = 'drum';
+          else if (animal.includes('bird') || animal.includes('peacock')) patternToPlay = 'screech';
+          else if (animal.includes('boar') || animal.includes('bear') || animal.includes('cow') || animal.includes('pig')) patternToPlay = 'roar';
+          else patternToPlay = 'ultrasound';
+      }
+  }
+
+  if (!isTest) lastSubjectGlobal = animal;
+
+  // Execute Generated Audio Sequences
+  if (patternToPlay === 'drum') {
+    // Massive, aggressive layered tribal drum bass
     for(let i=0; i<8; i++) {
         const t = ctx.currentTime + (i * 0.45);
         const sub = ctx.createOscillator(); const sg = ctx.createGain();
         sub.type = 'sine'; sub.frequency.setValueAtTime(100, t); sub.frequency.exponentialRampToValueAtTime(30, t+0.3);
-        sg.gain.setValueAtTime(3.0, t); sg.gain.exponentialRampToValueAtTime(0.01, t+0.3);
+        sg.gain.setValueAtTime(4.0, t); sg.gain.exponentialRampToValueAtTime(0.01, t+0.3);
         sub.connect(sg); sg.connect(ctx.destination); sub.start(t); sub.stop(t+0.4);
 
         const mid = ctx.createOscillator(); const mg = ctx.createGain();
         mid.type = 'sawtooth'; mid.frequency.setValueAtTime(150, t); mid.frequency.exponentialRampToValueAtTime(40, t+0.15);
-        mg.gain.setValueAtTime(1.5, t); mg.gain.exponentialRampToValueAtTime(0.01, t+0.2);
+        mg.gain.setValueAtTime(2.0, t); mg.gain.exponentialRampToValueAtTime(0.01, t+0.2);
         mid.connect(mg); mg.connect(ctx.destination); mid.start(t); mid.stop(t+0.3);
     }
   } 
-  // ----- PEACOCK / BIRD: Screeching Predator Sweeps -----
-  else if (animal.includes('bird') || animal.includes('peacock')) {
+  else if (patternToPlay === 'screech') {
+    // Screeching Predator Sweeps
     for(let i=0; i<5; i++) {
         const t = ctx.currentTime + (i * 0.6);
         const osc = ctx.createOscillator(); const g = ctx.createGain();
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(2000, t);
-        osc.frequency.exponentialRampToValueAtTime(6000, t + 0.3);
-        g.gain.setValueAtTime(2.0, t);
-        g.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
-        osc.connect(g); g.connect(ctx.destination);
-        osc.start(t); osc.stop(t + 0.6);
+        osc.type = 'triangle'; osc.frequency.setValueAtTime(2000, t); osc.frequency.exponentialRampToValueAtTime(6000, t + 0.3);
+        g.gain.setValueAtTime(2.0, t); g.gain.exponentialRampToValueAtTime(0.01, t + 0.5);
+        osc.connect(g); g.connect(ctx.destination); osc.start(t); osc.stop(t + 0.6);
 
-        // Clapping noise layer
         const snap = ctx.createOscillator(); const sGain = ctx.createGain();
         snap.type = 'square'; snap.frequency.setValueAtTime(150, t); snap.frequency.exponentialRampToValueAtTime(50, t+0.1);
         sGain.gain.setValueAtTime(1.5, t); sGain.gain.exponentialRampToValueAtTime(0.01, t+0.1);
         snap.connect(sGain); sGain.connect(ctx.destination); snap.start(t); snap.stop(t+0.2);
     }
   } 
-  // ----- WILD BOAR / BEAR / PIG: Low Frequency Roar & High pitched irritation -----
-  else if (animal.includes('boar') || animal.includes('bear') || animal.includes('cow') || animal.includes('dog')) {
+  else if (patternToPlay === 'roar') {
+    // Low Frequency Roar & High pitched irritation
     for(let i=0; i<4; i++) {
         const t = ctx.currentTime + (i * 0.8);
         const growl = ctx.createOscillator(); const gg = ctx.createGain();
         growl.type = 'sawtooth'; growl.frequency.setValueAtTime(40, t); growl.frequency.linearRampToValueAtTime(60, t+0.4);
-        gg.gain.setValueAtTime(2.5, t); gg.gain.linearRampToValueAtTime(0.01, t+0.6);
+        gg.gain.setValueAtTime(3.0, t); gg.gain.linearRampToValueAtTime(0.01, t+0.6);
         growl.connect(gg); gg.connect(ctx.destination); growl.start(t); growl.stop(t+0.7);
 
         const whistle = ctx.createOscillator(); const wg = ctx.createGain();
@@ -83,15 +111,13 @@ function playDeterrenceSound(subject) {
         whistle.connect(wg); wg.connect(ctx.destination); whistle.start(t); whistle.stop(t+0.8);
     }
   }
-  // ----- MONKEY / CAT / SMALL MAMMALS: Ultrasound Chaos sweeps -----
   else {
+    // Ultrasound Chaos sweeps
     for(let i=0; i<10; i++) {
         const t = ctx.currentTime + (i * 0.25);
         const osc = ctx.createOscillator(); const g = ctx.createGain();
-        osc.type = 'square';
-        osc.frequency.setValueAtTime(14000 + Math.random()*2000, t); // Piercing high freq
-        osc.frequency.linearRampToValueAtTime(15000, t+0.1);
-        g.gain.setValueAtTime(1.0, t); g.gain.linearRampToValueAtTime(0.01, t+0.2);
+        osc.type = 'square'; osc.frequency.setValueAtTime(14000 + Math.random()*2000, t); osc.frequency.linearRampToValueAtTime(15000, t+0.1);
+        g.gain.setValueAtTime(1.5, t); g.gain.linearRampToValueAtTime(0.01, t+0.2);
         osc.connect(g); g.connect(ctx.destination); osc.start(t); osc.stop(t+0.25);
     }
   }
