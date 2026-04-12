@@ -15,10 +15,21 @@ import './index.css';
 // Initialize WebSocket Client
 const socket = io('http://localhost:3000');
 
+let activeAudioContexts = [];
+
+export function stopDeterrenceSound() {
+  activeAudioContexts.forEach(ctx => {
+    try { ctx.close(); } catch(e){}
+  });
+  activeAudioContexts = [];
+  if (window.speechSynthesis) window.speechSynthesis.cancel();
+}
+
 function playDeterrenceSound(subject) {
   const AudioContext = window.AudioContext || window.webkitAudioContext;
   if (!AudioContext) return;
   const ctx = new AudioContext();
+  activeAudioContexts.push(ctx);
   const oscillator = ctx.createOscillator();
   const gainNode = ctx.createGain();
   
@@ -209,9 +220,9 @@ export default function App() {
             <Routes>
               <Route path="/" element={<Navigate to="/overview" />} />
               <Route path="/overview" element={<Overview systemState={systemState} />} />
-              <Route path="/live" element={<LiveMonitor systemState={systemState} playSound={playDeterrenceSound} />} />
+              <Route path="/live" element={<LiveMonitor systemState={systemState} playSound={playDeterrenceSound} stopSound={stopDeterrenceSound} />} />
               <Route path="/hardware" element={<HardwareData systemState={systemState} />} />
-              <Route path="/vision" element={<AIVision systemState={systemState} playSound={playDeterrenceSound} />} />
+              <Route path="/vision" element={<AIVision systemState={systemState} playSound={playDeterrenceSound} stopSound={stopDeterrenceSound} />} />
               <Route path="/settings" element={<FarmerSettings />} />
               <Route path="/analytics" element={<Analytics systemState={systemState} />} />
               <Route path="/alerts" element={<AlertCenter systemState={systemState} />} />

@@ -4,7 +4,7 @@ import Webcam from 'react-webcam';
 import * as cocoSsd from '@tensorflow-models/coco-ssd';
 import '@tensorflow/tfjs';
 
-export default function AIVision({ systemState, playSound }) {
+export default function AIVision({ systemState, playSound, stopSound }) {
   const isAlert = systemState.status !== 'Safe';
   
   const webcamRef = useRef(null);
@@ -237,7 +237,10 @@ export default function AIVision({ systemState, playSound }) {
             <button 
               className="btn" 
               style={{ width: '100%', backgroundColor: 'var(--error)', color: 'white', marginTop: '0.5rem' }}
-              onClick={() => alert("EMERGENCY OVERRIDE ENGAGED. Deterrence hardware halted.")}
+              onClick={() => {
+                if (stopSound) stopSound();
+                alert("EMERGENCY OVERRIDE ENGAGED. Deterrence hardware halted.");
+              }}
             >
               EMERGENCY STOP
             </button>
