@@ -10,7 +10,7 @@
 
 **AI-Driven Wildlife Intrusion Detection & Bio-Acoustic Deterrence System** for protecting farmlands from elephants, wild boars, birds, and more. Real-time dashboard with computer vision, IoT sensor integration, automated alerts (WhatsApp/SMS), and intelligent sound deterrence using WebAudio API.
 
-![Hero](src/assets/hero.png)
+![Hero](src/assets/wildlife.png)
 
 ### ✨ **Key Features**
 - **🤖 AI Vision**: Real-time object detection with TensorFlow.js Coco-SSD + Webcam
