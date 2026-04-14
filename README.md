@@ -86,15 +86,14 @@ Wild Boar: 'High-pitch chaotic alarm sweeps'
 ## 🖥️ **Screenshots**
 
 ### Dashboard Overview
-![Overview](/screenshots/overview.png)
+![Overview](/public/screenshots/Overview.png)
 
 ### AI Vision in Action
-![AIVision](/screenshots/ai-vision.png)
+![AIVision](/public/screenshots/AIVision.png)
 
 ### Alert Center
-![Alerts](/screenshots/alerts.png)
+![Alerts](/public/screenshots/Alerts.png)
 
-*(Add your screenshots to `/public/screenshots/` for auto-hosting)*
 
 ## 🎮 **Deterrence Audio Patterns**
 - **Drum**: Elephant herds (infrasonic disruption)
